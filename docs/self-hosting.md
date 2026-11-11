@@ -41,3 +41,11 @@ There are no migrations, user accounts, admin site, or stored links. The Docker 
 Check the public app, its JavaScript, a valid API POST, invalid schemes, HTTP redirect, sensitive-file 404s, container health and isolation. Recheck the portfolio homepage and project page.
 
 For rollback, retain the previous image tag and source archive before rebuilding; restore the matching source/configuration and recreate this service using that image. The portfolio proxy and project entry are a separate small commit in its deployed repository. Keep its previous `.next` build until the new portfolio passes the live checks. Do not deploy the unfinished local portfolio tree as part of this app update.
+
+## Initial release record
+
+The initial app runtime is source revision `24db2fb6d31044f2490f65e1228dc74d26db36cc`, image `easy-hyperlink:24db2fb`. `.env.production` also selects `RELEASE_TAG=24db2fb`. The matching portfolio revision is `7407fde0537b14ec82294b744c19dc26bbb937c5`.
+
+The portfolio's previous `.next`, `node_modules`, source archive, and revision record are retained in `/home/oscareustate/apps/easy-hyperlink-portfolio-backup-20261111`. The live portfolio remained on its existing source/deploy mechanism; the user's unfinished local portfolio edits were not deployed.
+
+The final app does not publish port 8140 or any other host port. A Docker internal-only network does not provide the originally attempted loopback port mapping, so the host proxy uses the verified private container address instead. Its subnet and fixed address are explicit in Compose.
