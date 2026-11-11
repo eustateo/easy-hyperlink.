@@ -1,0 +1,4 @@
+App icon paths: Simple Icons, version 12.0.0.
+Source: https://github.com/simple-icons/simple-icons/tree/12.0.0/icons
+License: CC0-1.0, https://creativecommons.org/publicdomain/zero/1.0/
+Brand colors are applied locally. App names and logos identify the editors discussed; they do not imply endorsement or partnership.
