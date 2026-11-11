@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -74,7 +74,7 @@
         </div>
         <div class="field">
           <label for="url">Web address</label>
-          <input id="url" name="url" type="url" placeholder="https://example.com" aria-describedby="url-hint" required>
+          <input id="url" name="url" type="url" maxlength="2048" placeholder="https://example.com" aria-describedby="url-hint" required>
           <p class="hint" id="url-hint">Include https:// or http:// at the beginning.</p>
         </div>
         <div class="actions">
@@ -92,89 +92,8 @@
       </section>
     </div>
   </main>
-  <footer>Easy Hyperlink &middot; Made with Django and FastAPI</footer>
+  <footer>Easy Hyperlink &middot; Made with Django and FastAPI &middot; <a href="https://oscareustate.com/projects/easy-hyperlink">About this project</a><br>Links are not saved. Only open destinations you trust.</footer>
 
-  <script>
-    const form = document.getElementById("link-form");
-    const message = document.getElementById("message");
-    const result = document.getElementById("result");
-    const linkContainer = document.getElementById("link-container");
-    const createButton = document.getElementById("create-button");
-    let requestVersion = 0;
-
-    form.addEventListener("submit", async function (event) {
-      event.preventDefault();
-      const version = ++requestVersion;
-      message.textContent = "";
-      result.hidden = true;
-      linkContainer.replaceChildren();
-      createButton.disabled = true;
-
-      const data = {
-        name: document.getElementById("name").value,
-        url: document.getElementById("url").value
-      };
-
-      try {
-        const response = await fetch("http://127.0.0.1:8001/links", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data)
-        });
-        if (version !== requestVersion) return;
-        if (!response.ok) {
-          message.textContent = "Please enter a name and a valid HTTP or HTTPS web address.";
-          return;
-        }
-
-        const linkData = await response.json();
-        if (version !== requestVersion) return;
-        const link = document.createElement("a");
-        link.href = linkData.url;
-        link.textContent = linkData.name;
-        linkContainer.appendChild(link);
-        result.hidden = false;
-      } catch (error) {
-        if (version === requestVersion) {
-          message.textContent = "Could not reach the API. Check that the FastAPI server is running.";
-        }
-      } finally {
-        if (version === requestVersion) createButton.disabled = false;
-      }
-    });
-
-    document.getElementById("clear-button").addEventListener("click", function () {
-      requestVersion++;
-      form.reset();
-      result.hidden = true;
-      linkContainer.replaceChildren();
-      message.textContent = "";
-      createButton.disabled = false;
-      document.getElementById("name").focus();
-    });
-
-    document.getElementById("copy-button").addEventListener("click", async function () {
-      const link = linkContainer.querySelector("a");
-      if (!link) return;
-
-      try {
-        if (navigator.clipboard && navigator.clipboard.write && window.ClipboardItem) {
-          const item = new ClipboardItem({
-            "text/html": new Blob([link.outerHTML], { type: "text/html" }),
-            "text/plain": new Blob([link.href], { type: "text/plain" })
-          });
-          await navigator.clipboard.write([item]);
-          message.textContent = "Hyperlink copied. Paste it into a rich-text editor.";
-        } else if (navigator.clipboard && navigator.clipboard.writeText) {
-          await navigator.clipboard.writeText(link.href);
-          message.textContent = "Link address copied. Your browser does not support copying formatted links.";
-        } else {
-          message.textContent = "Clipboard access is unavailable. Right-click the link and copy its address.";
-        }
-      } catch (error) {
-        message.textContent = "Could not copy automatically. Right-click the link and copy its address.";
-      }
-    });
-  </script>
+  <script src="{{ app_js_url }}" data-api-url="{{ api_url }}" defer></script>
 </body>
 </html>

@@ -1,31 +1,30 @@
 # Easy Hyperlink
 
-A small learning project that uses Django to serve a page and FastAPI to validate link names and web addresses. Create a link, copy it as rich text in supported applications, or copy its address using the browser's context menu. Links are not saved.
+Create a named hyperlink, preview it, and copy it as rich text in supported applications. Django serves the page and FastAPI validates HTTP/HTTPS addresses. Links are not saved, and the server does not visit the supplied address.
+
+**Live app:** https://oscareustate.com/easy-hyperlink
+
+**Project page:** https://oscareustate.com/projects/easy-hyperlink
 
 ## Run locally
 
-Install Python 3.12 or newer and [uv](https://docs.astral.sh/uv/). From this directory, install dependencies:
+Install Python 3.12+ and [uv](https://docs.astral.sh/uv/), then:
 
-```powershell
-uv sync
+```sh
+uv sync --frozen
+uv run uvicorn config.asgi:application --reload --host 127.0.0.1 --port 8000
 ```
 
-In one terminal run Django:
+Open http://127.0.0.1:8000/. The page and API run together; a second API server is no longer needed. Local development defaults to debug mode and localhost hosts. Do not publish this development command.
 
-```powershell
-uv run python manage.py runserver 127.0.0.1:8000
+## Production and verification
+
+See [self-hosting](docs/self-hosting.md) for the container configuration, proxy route, update and rollback process. See [security review](docs/security-review.md) for verified controls and outstanding host checks.
+
+```sh
+uv run python -m unittest discover -s tests -v
 ```
 
-In another terminal run the API:
+Production requires `DJANGO_DEBUG=false`, a persistent random `DJANGO_SECRET_KEY`, explicit `DJANGO_ALLOWED_HOSTS`, and HTTPS. `.env.example` documents the deployment variables. Environment files, local databases, and virtual environments are excluded from Git and Docker build context.
 
-```powershell
-uv run uvicorn api:app --reload --host 127.0.0.1 --port 8001
-```
-
-Open http://127.0.0.1:8000/. Both servers must run for the form to work. Stop either server with Ctrl+C.
-
-## Security and development
-
-This is a local learning project, not a production deployment configuration. Django debug mode is enabled, and the browser and CORS settings are tied to localhost. Do not expose the development servers to the internet. For deployment, configure a persistent secret key through `DJANGO_SECRET_KEY`, disable debug mode, configure allowed hosts and HTTPS, and follow Django's deployment checklist. Without the environment variable, a new random key is generated on each startup, invalidating signed sessions when the server restarts.
-
-The local SQLite database, environment files, and virtual environment are excluded from Git. The API checks URL syntax but cannot establish whether a destination is trustworthy. Rich-text paste depends on the destination application; some apps paste only the URL.
+The API validates syntax, not whether a destination is trustworthy. It rejects non-HTTP(S) URLs, URLs containing credentials, oversized requests, and empty link names. User text is inserted with `textContent`; formatted clipboard HTML is created from the resulting DOM anchor. Some applications paste only a URL. Only open destinations you trust.

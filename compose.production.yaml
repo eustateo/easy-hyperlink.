@@ -1,0 +1,33 @@
+name: easy-hyperlink
+services:
+  web:
+    build: .
+    image: easy-hyperlink:${RELEASE_TAG:-local}
+    restart: unless-stopped
+    env_file: .env.production
+    ports:
+      - "127.0.0.1:8140:8000"
+    user: "10001:10001"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=16m
+    pids_limit: 64
+    mem_limit: 256m
+    cpus: 0.50
+    networks: [isolated]
+    healthcheck:
+      test: [CMD, /app/.venv/bin/python, -c, "import urllib.request; r=urllib.request.Request('http://127.0.0.1:8000/easy-hyperlink/', headers={'Host':'oscareustate.com','CF-Visitor':'{\"scheme\":\"https\"}'}); urllib.request.urlopen(r, timeout=5)"]
+      interval: 30s
+      timeout: 6s
+      retries: 3
+      start_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: 5m
+        max-file: "2"
+networks:
+  isolated:
+    internal: true

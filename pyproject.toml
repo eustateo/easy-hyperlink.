@@ -1,7 +1,7 @@
 [project]
 name = "easy-hyperlink"
 version = "0.1.0"
-description = "Add your description here"
+description = "Create and copy named hyperlinks with Django and FastAPI"
 readme = "README.md"
 authors = [
     { name = "Oscar Eustate" }

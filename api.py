@@ -1,20 +1,24 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+import os
 from pydantic import BaseModel, Field, HttpUrl, field_validator
 
-app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://127.0.0.1:8000"],
-    allow_methods=["POST"],
-    allow_headers=["Content-Type"],
+app = FastAPI(
+    docs_url='/docs' if os.environ.get('DJANGO_DEBUG', 'true').lower() == 'true' else None,
+    redoc_url=None,
+    openapi_url=None,
 )
 
 
 class LinkInput(BaseModel):
     name: str = Field(min_length=1, max_length=100)
-    url: HttpUrl
+    url: HttpUrl = Field(max_length=2048)
+
+    @field_validator('url')
+    @classmethod
+    def reject_credentials(cls, value):
+        if value.username is not None or value.password is not None:
+            raise ValueError('Web addresses must not contain login credentials.')
+        return value
 
     @field_validator("name", mode="before")
     @classmethod
