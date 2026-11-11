@@ -13,7 +13,7 @@ os.environ.update(
 from config.asgi import application
 
 
-async def request(path, *, method='GET', body=b'', host='oscareustate.com', scheme='https', chunks=None):
+async def request(path, *, method='GET', body=b'', host='oscareustate.com', scheme='https', chunks=None, forwarded_host=None):
     events = []
     chunks = list(chunks if chunks is not None else [body])
     scope = {
@@ -24,6 +24,8 @@ async def request(path, *, method='GET', body=b'', host='oscareustate.com', sche
         'headers': [(b'host', host.encode()), (b'content-type', b'application/json'),
                     (b'cf-visitor', json.dumps({'scheme': scheme}).encode())],
     }
+    if forwarded_host is not None:
+        scope['headers'].append((b'x-forwarded-host', forwarded_host.encode()))
 
     async def receive():
         if chunks:
@@ -82,6 +84,16 @@ class PublicAppTests(unittest.TestCase):
     def test_chunked_payload_limit(self):
         self.assertEqual(self.call('/easy-hyperlink/api/links', method='POST',
             chunks=[b'x'*9000, b'x'*9000])[0], 413)
+
+    def test_proxy_preserves_validated_public_host(self):
+        self.assertEqual(self.call('/easy-hyperlink/', host='172.23.0.2:8000',
+            forwarded_host='oscareustate.com')[0], 200)
+        self.assertEqual(self.call('/easy-hyperlink/', host='172.23.0.2:8000',
+            forwarded_host='evil.example')[0], 400)
+        status, headers, _ = self.call('/easy-hyperlink/', host='172.23.0.2:8000',
+            forwarded_host='oscareustate.com', scheme='http')
+        self.assertEqual(status, 307)
+        self.assertEqual(headers[b'location'], b'https://oscareustate.com/easy-hyperlink/')
 
     def test_no_admin_or_api_schema(self):
         for path in ['/easy-hyperlink/admin/', '/easy-hyperlink/api/docs',

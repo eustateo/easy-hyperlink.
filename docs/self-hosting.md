@@ -4,15 +4,15 @@
 
 The public app is https://oscareustate.com/easy-hyperlink, and the portfolio project page is https://oscareustate.com/projects/easy-hyperlink.
 
-Traffic follows the existing Cloudflare Tunnel → nginx on loopback port 8080 → portfolio Next.js on loopback port 3000 → Easy Hyperlink on loopback port 8140. No DNS change, inbound router rule, SSH tunnel, or SSH configuration change is required.
+Traffic follows the existing Cloudflare Tunnel → nginx on loopback port 8080 → portfolio Next.js on loopback port 3000 → Easy Hyperlink on the internal Docker address `172.23.0.2:8000`. No DNS change, inbound router rule, SSH tunnel, or SSH configuration change is required.
 
-The portfolio's `next.config.ts` rewrites `/easy-hyperlink` to `http://127.0.0.1:8140/easy-hyperlink/`, and `/easy-hyperlink/:path+` to the corresponding backend path. The first rewrite deliberately adds the slash only at the backend because Next.js removes trailing slashes publicly. Browser API and JavaScript URLs are absolute paths under `/easy-hyperlink`, so either public URL works.
+The portfolio's `next.config.ts` rewrites `/easy-hyperlink` to `http://172.23.0.2:8000/easy-hyperlink/`, and `/easy-hyperlink/:path+` to the corresponding backend path. The first rewrite deliberately adds the slash only at the backend because Next.js removes trailing slashes publicly. Browser API and JavaScript URLs are absolute paths under `/easy-hyperlink`, so either public URL works.
 
 ## Runtime isolation
 
-`compose.production.yaml` runs a non-root container with a read-only filesystem, all Linux capabilities dropped, no privilege escalation, default seccomp/AppArmor, resource limits, and a private internal Docker network. The only published port binds to `127.0.0.1`. There are no host directory mounts, SSH key mounts, Docker socket mounts, privileged mode, or host networking. The service restarts automatically and has a healthcheck. The source and container contain no SSH client credentials.
+`compose.production.yaml` runs a non-root container with a read-only filesystem, all Linux capabilities dropped, no privilege escalation, default seccomp/AppArmor, resource limits, and a private internal Docker network. It publishes no host ports. The host proxy reaches the fixed private address on the internal Docker network. There are no host directory mounts, SSH key mounts, Docker socket mounts, privileged mode, or host networking. The service restarts automatically and has a healthcheck. The source and container contain no SSH client credentials.
 
-The application does not need outbound internet access. An internal Docker network blocks ordinary external routing. This is not a VM boundary; the host kernel and Docker daemon remain part of the trusted computing base. Internal networks alone do not prove all host services are unreachable.
+The subnet was checked against existing Docker networks before being reserved; do not change it without updating the portfolio rewrite and checking for conflicts. The application does not need outbound internet access. An internal Docker network blocks ordinary external routing. This is not a VM boundary; the host kernel and Docker daemon remain part of the trusted computing base. Internal networks alone do not prove all host services are unreachable.
 
 ## Configuration
 
@@ -20,7 +20,7 @@ Server source: `/home/oscareustate/apps/easy-hyperlink`.
 
 Create `.env.production` with mode `0600`, using `.env.example` as a guide. Generate a secret on the server, not in the repository. Do not print or commit the resulting environment file.
 
-`TRUST_CLOUDFLARE=true` must only be used with this loopback-only proxy chain. Cloudflare supplies `CF-Visitor` with the original scheme. nginx currently overwrites `X-Forwarded-Proto` with the local HTTP scheme, so the app explicitly derives HTTPS from `CF-Visitor` instead. Uvicorn's generic proxy-header trust is disabled. All app and API routes redirect HTTP to HTTPS and reject unexpected hosts.
+`TRUST_CLOUDFLARE=true` must only be used with this private proxy chain. Cloudflare supplies `CF-Visitor` with the original scheme. nginx currently overwrites `X-Forwarded-Proto` with the local HTTP scheme, so the app explicitly derives HTTPS from `CF-Visitor` instead. Uvicorn's generic proxy-header trust is disabled. Next.js supplies the original host in `X-Forwarded-Host`; the app restores and validates it before redirecting. All app and API routes redirect HTTP to HTTPS and reject unexpected hosts.
 
 HSTS lasts one hour for the current hostname. It intentionally does not cover all subdomains or request browser preloading. Django's corresponding two optional warnings remain visible in the security review.
 

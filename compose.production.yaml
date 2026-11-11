@@ -5,8 +5,6 @@ services:
     image: easy-hyperlink:${RELEASE_TAG:-local}
     restart: unless-stopped
     env_file: .env.production
-    ports:
-      - "127.0.0.1:8140:8000"
     user: "10001:10001"
     read_only: true
     cap_drop: [ALL]
@@ -16,7 +14,9 @@ services:
     pids_limit: 64
     mem_limit: 256m
     cpus: 0.50
-    networks: [isolated]
+    networks:
+      isolated:
+        ipv4_address: 172.23.0.2
     healthcheck:
       test: [CMD, /app/.venv/bin/python, -c, "import urllib.request; r=urllib.request.Request('http://127.0.0.1:8000/easy-hyperlink/', headers={'Host':'oscareustate.com','CF-Visitor':'{\"scheme\":\"https\"}'}); urllib.request.urlopen(r, timeout=5)"]
       interval: 30s
@@ -31,3 +31,6 @@ services:
 networks:
   isolated:
     internal: true
+    ipam:
+      config:
+        - subnet: 172.23.0.0/16

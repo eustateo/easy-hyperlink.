@@ -19,7 +19,7 @@ class PublicAppMiddleware:
 
         headers = dict(scope['headers'])
         # Enable only behind the existing Cloudflare -> nginx -> Next.js chain.
-        # The container port is published solely on host loopback. Cloudflare
+        # The container has no published ports and an internal-only network. Cloudflare
         # supplies this header; nginx currently overwrites X-Forwarded-Proto.
         if self.trust_cloudflare:
             try:
@@ -27,6 +27,12 @@ class PublicAppMiddleware:
             except (ValueError, AttributeError, UnicodeDecodeError):
                 scheme = None
             scope = dict(scope, scheme='https' if scheme == 'https' else 'http')
+            # Next.js changes Host to the backend IP and supplies the original
+            # host itself. Restore it before TrustedHostMiddleware validates it.
+            if b'x-forwarded-host' in headers:
+                scope['headers'] = [
+                    (key, value) for key, value in scope['headers'] if key != b'host'
+                ] + [(b'host', headers[b'x-forwarded-host'])]
 
         async def secure_send(message):
             if message['type'] == 'http.response.start':
