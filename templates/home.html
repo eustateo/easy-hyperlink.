@@ -1,0 +1,180 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Easy Hyperlink</title>
+  <style>
+    :root { color-scheme: light; font-family: Arial, Helvetica, sans-serif; color: #243442; background: #f3f5f7; }
+    * { box-sizing: border-box; }
+    body { margin: 0; line-height: 1.5; }
+    .topbar { background: #1e415e; border-bottom: 5px solid #ffcf42; color: white; }
+    .topbar-inner { max-width: 1000px; margin: auto; padding: 18px 24px; display: flex; align-items: center; gap: 13px; }
+    .brand-mark { display: grid; place-items: center; width: 42px; height: 42px; border: 2px solid #ffcf42; border-radius: 12px; color: #ffcf42; font-weight: 700; font-size: 20px; }
+    .brand { font-size: 20px; font-weight: 700; letter-spacing: .01em; }
+    .brand small { display: block; color: #c4d8e7; font-size: 12px; font-weight: 400; }
+    .hero { background: #2b5b84; color: white; }
+    .hero-inner { max-width: 1000px; margin: auto; padding: 45px 24px 70px; }
+    .eyebrow { color: #ffdf76; font-size: 12px; font-weight: 700; letter-spacing: .13em; text-transform: uppercase; }
+    h1 { margin: 8px 0 8px; font-size: clamp(32px, 5vw, 44px); line-height: 1.15; }
+    .hero p { max-width: 580px; margin: 0; color: #e0ecf5; font-size: 17px; }
+    main { max-width: 1000px; margin: -36px auto 0; padding: 0 24px 48px; position: relative; }
+    .card { max-width: 720px; background: white; border: 1px solid #d9e1e8; border-radius: 8px; box-shadow: 0 8px 25px #1e415e18; padding: clamp(22px, 4vw, 36px); }
+    h2 { font-size: 21px; margin: 0 0 5px; color: #1e415e; }
+    .intro, .hint { color: #566a79; margin: 0; }
+    .intro { margin-bottom: 25px; }
+    .field { margin-bottom: 20px; }
+    label { display: block; font-weight: 700; margin-bottom: 6px; }
+    input { display: block; width: 100%; min-height: 48px; padding: 11px 13px; border: 1px solid #aebec9; border-radius: 4px; color: #243442; font: inherit; }
+    input:focus-visible, button:focus-visible, a:focus-visible { outline: 3px solid #e9ad16; outline-offset: 2px; }
+    .hint { font-size: 13px; margin-top: 6px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; }
+    button { min-height: 46px; padding: 10px 19px; border-radius: 4px; font: inherit; font-weight: 700; cursor: pointer; }
+    .primary { border: 1px solid #e1aa15; background: #ffcf42; color: #243442; }
+    .primary:hover { background: #f2c032; }
+    .secondary { border: 1px solid #9fb2c0; background: white; color: #244c6b; }
+    .secondary:hover { background: #eef4f8; }
+    button:disabled { opacity: .65; cursor: wait; }
+    .status { min-height: 24px; margin: 16px 0 0; color: #8d351b; }
+    .status:empty { display: none; }
+    .result { margin-top: 24px; padding: 20px; background: #f0f6fa; border: 1px solid #c7dce9; border-left: 4px solid #3776ab; border-radius: 4px; }
+    .result[hidden] { display: none; }
+    .result h2 { font-size: 16px; margin: 0 0 8px; }
+    .result a { color: #205b89; font-weight: 700; overflow-wrap: anywhere; }
+    .result .hint { margin: 8px 0 16px; }
+    footer { max-width: 1000px; margin: auto; padding: 0 24px 30px; color: #617481; font-size: 13px; }
+    @media (max-width: 480px) { .actions button { flex: 1 1 auto; } .hero-inner { padding-top: 32px; } }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <span class="brand-mark" aria-hidden="true">&lt;/&gt;</span>
+      <div class="brand">Easy Hyperlink<small>A simple link-making tool</small></div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-inner">
+      <span class="eyebrow">Make a link in seconds</span>
+      <h1>Give your links a name.</h1>
+      <p>Turn a web address into a neat, clickable hyperlink you can share.</p>
+    </div>
+  </section>
+
+  <main>
+    <div class="card">
+      <h2>Create a hyperlink</h2>
+      <p class="intro">Add the text people will see and the address it should open.</p>
+
+      <form id="link-form">
+        <div class="field">
+          <label for="name">Link name</label>
+          <input id="name" name="name" maxlength="100" placeholder="e.g. Python website" required>
+        </div>
+        <div class="field">
+          <label for="url">Web address</label>
+          <input id="url" name="url" type="url" placeholder="https://example.com" aria-describedby="url-hint" required>
+          <p class="hint" id="url-hint">Include https:// or http:// at the beginning.</p>
+        </div>
+        <div class="actions">
+          <button class="primary" id="create-button" type="submit">Create hyperlink</button>
+          <button class="secondary" id="clear-button" type="button">Clear</button>
+        </div>
+      </form>
+
+      <p class="status" id="message" role="status" aria-live="polite"></p>
+      <section class="result" id="result" aria-labelledby="result-title" hidden>
+        <h2 id="result-title">Your hyperlink</h2>
+        <div id="link-container"></div>
+        <p class="hint">Copy the link below, or right-click the link to copy its address.</p>
+        <button class="secondary" id="copy-button" type="button">Copy hyperlink</button>
+      </section>
+    </div>
+  </main>
+  <footer>Easy Hyperlink &middot; Made with Django and FastAPI</footer>
+
+  <script>
+    const form = document.getElementById("link-form");
+    const message = document.getElementById("message");
+    const result = document.getElementById("result");
+    const linkContainer = document.getElementById("link-container");
+    const createButton = document.getElementById("create-button");
+    let requestVersion = 0;
+
+    form.addEventListener("submit", async function (event) {
+      event.preventDefault();
+      const version = ++requestVersion;
+      message.textContent = "";
+      result.hidden = true;
+      linkContainer.replaceChildren();
+      createButton.disabled = true;
+
+      const data = {
+        name: document.getElementById("name").value,
+        url: document.getElementById("url").value
+      };
+
+      try {
+        const response = await fetch("http://127.0.0.1:8001/links", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+        if (version !== requestVersion) return;
+        if (!response.ok) {
+          message.textContent = "Please enter a name and a valid HTTP or HTTPS web address.";
+          return;
+        }
+
+        const linkData = await response.json();
+        if (version !== requestVersion) return;
+        const link = document.createElement("a");
+        link.href = linkData.url;
+        link.textContent = linkData.name;
+        linkContainer.appendChild(link);
+        result.hidden = false;
+      } catch (error) {
+        if (version === requestVersion) {
+          message.textContent = "Could not reach the API. Check that the FastAPI server is running.";
+        }
+      } finally {
+        if (version === requestVersion) createButton.disabled = false;
+      }
+    });
+
+    document.getElementById("clear-button").addEventListener("click", function () {
+      requestVersion++;
+      form.reset();
+      result.hidden = true;
+      linkContainer.replaceChildren();
+      message.textContent = "";
+      createButton.disabled = false;
+      document.getElementById("name").focus();
+    });
+
+    document.getElementById("copy-button").addEventListener("click", async function () {
+      const link = linkContainer.querySelector("a");
+      if (!link) return;
+
+      try {
+        if (navigator.clipboard && navigator.clipboard.write && window.ClipboardItem) {
+          const item = new ClipboardItem({
+            "text/html": new Blob([link.outerHTML], { type: "text/html" }),
+            "text/plain": new Blob([link.href], { type: "text/plain" })
+          });
+          await navigator.clipboard.write([item]);
+          message.textContent = "Hyperlink copied. Paste it into a rich-text editor.";
+        } else if (navigator.clipboard && navigator.clipboard.writeText) {
+          await navigator.clipboard.writeText(link.href);
+          message.textContent = "Link address copied. Your browser does not support copying formatted links.";
+        } else {
+          message.textContent = "Clipboard access is unavailable. Right-click the link and copy its address.";
+        }
+      } catch (error) {
+        message.textContent = "Could not copy automatically. Right-click the link and copy its address.";
+      }
+    });
+  </script>
+</body>
+</html>
