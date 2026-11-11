@@ -85,3 +85,11 @@ const apiUrl = document.currentScript.dataset.apiUrl;
         message.textContent = "Could not copy automatically. Right-click the link and copy its address.";
       }
     });
+
+    const logoMotionToggle = document.getElementById("logo-motion-toggle");
+    const logoTrack = document.getElementById("app-logo-track");
+    logoMotionToggle.addEventListener("click", function () {
+      const paused = logoTrack.classList.toggle("is-paused");
+      logoMotionToggle.setAttribute("aria-pressed", String(paused));
+      logoMotionToggle.textContent = paused ? "Resume motion" : "Pause motion";
+    });
