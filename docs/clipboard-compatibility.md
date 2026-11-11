@@ -4,6 +4,8 @@ Easy Hyperlink writes both HTML (the named anchor) and plain text (the original 
 
 The page lists editors that support named hyperlinks. This is documentation-based guidance, not a tested browser/app compatibility matrix. Rich-text import, app versions, compose modes, and paste options can affect whether the label survives.
 
+- [Microsoft Teams links](https://support.microsoft.com/en-us/teams/chat/send-a-file-picture-or-link-in-microsoft-teams): the formatted chat/channel composer supports display text and a URL via Format → Insert link. Clipboard import can vary.
+- [Zoom Chat message formatting](https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0066130): the rich-text composer supports a link on selected text. This does not establish identical behavior for every in-meeting chat client. [Zoom release notes](https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0064537) also document administrator controls that can disable hyperlinks.
 - [Gmail formatting](https://support.google.com/mail/answer/8260?co=GENIE.Platform%3DDesktop): use the message body with plain text mode disabled.
 - [Outlook formatting](https://support.microsoft.com/en-us/outlook/format-email-messages-in-outlook-for-mac): use an HTML message body and preserve formatting when pasting.
 - [Word paste options](https://support.microsoft.com/en-us/word/control-the-formatting-when-you-paste-text): Keep Source Formatting preserves source formatting.
