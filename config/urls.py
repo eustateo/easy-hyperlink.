@@ -19,6 +19,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
+    path("favicon.svg", views.favicon, name="favicon"),
     path("app.js", views.app_js, name="app_js"),
     path("", views.home, name="home"),
 ]

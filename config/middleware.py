@@ -45,7 +45,7 @@ class PublicAppMiddleware:
                     b'cache-control': b'no-store',
                     b'content-security-policy': (
                         b"default-src 'none'; script-src 'self'; "
-                        b"style-src 'self' 'unsafe-inline'; connect-src 'self'; "
+                        b"style-src 'self' 'unsafe-inline'; connect-src 'self'; img-src 'self'; "
                         b"base-uri 'none'; frame-ancestors 'none'; form-action 'self'"
                     ),
                 }

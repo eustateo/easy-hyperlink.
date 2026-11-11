@@ -4,13 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Easy Hyperlink</title>
+  <meta name="description" content="Give a web address a clear name, then copy the formatted hyperlink into emails, documents, and notes that support rich text.">
+  <link rel="icon" type="image/svg+xml" sizes="any" href="{{ favicon_url }}">
   <style>
     :root { color-scheme: light; font-family: Arial, Helvetica, sans-serif; color: #243442; background: #f3f5f7; }
     * { box-sizing: border-box; }
     body { margin: 0; line-height: 1.5; }
     .topbar { background: #1e415e; border-bottom: 5px solid #ffcf42; color: white; }
     .topbar-inner { max-width: 1000px; margin: auto; padding: 18px 24px; display: flex; align-items: center; gap: 13px; }
-    .brand-mark { display: grid; place-items: center; width: 42px; height: 42px; border: 2px solid #ffcf42; border-radius: 12px; color: #ffcf42; font-weight: 700; font-size: 20px; }
+    .brand-mark { display: block; width: 42px; height: 42px; }
     .brand { font-size: 20px; font-weight: 700; letter-spacing: .01em; }
     .brand small { display: block; color: #c4d8e7; font-size: 12px; font-weight: 400; }
     .hero { background: #2b5b84; color: white; }
@@ -20,6 +22,7 @@
     .hero p { max-width: 580px; margin: 0; color: #e0ecf5; font-size: 17px; }
     main { max-width: 1000px; margin: -36px auto 0; padding: 0 24px 48px; position: relative; }
     .card { max-width: 720px; background: white; border: 1px solid #d9e1e8; border-radius: 8px; box-shadow: 0 8px 25px #1e415e18; padding: clamp(22px, 4vw, 36px); }
+    .card + .card { margin-top: 24px; }
     h2 { font-size: 21px; margin: 0 0 5px; color: #1e415e; }
     .intro, .hint { color: #566a79; margin: 0; }
     .intro { margin-bottom: 25px; }
@@ -42,14 +45,32 @@
     .result h2 { font-size: 16px; margin: 0 0 8px; }
     .result a { color: #205b89; font-weight: 700; overflow-wrap: anywhere; }
     .result .hint { margin: 8px 0 16px; }
+    a { color: #205b89; text-underline-offset: 3px; }
+    h3 { margin: 0 0 6px; font-size: 16px; color: #1e415e; }
+    .steps { padding-left: 22px; margin: 20px 0 0; }
+    .steps li { padding-left: 4px; margin: 12px 0; }
+    .steps li::marker { color: #205b89; font-weight: 700; }
+    .comparison { display: grid; gap: 14px; margin: 22px 0 16px; }
+    .comparison-item { min-width: 0; padding: 18px; border: 1px solid #d9e1e8; border-radius: 6px; background: #f8fafb; }
+    .comparison-item p { margin: 8px 0 0; }
+    .comparison-item code { font-size: 13px; overflow-wrap: anywhere; }
+    .comparison-item.after { background: #f0f6fa; border-left: 4px solid #3776ab; }
+    .example-label { margin: 0; color: #566a79; font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    .app-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; list-style: none; padding: 0; margin: 22px 0; }
+    .app-list li { border: 1px solid #d9e1e8; border-radius: 6px; padding: 16px; }
+    .app-list a { font-weight: 700; }
+    .app-list p { color: #566a79; font-size: 14px; margin: 7px 0 0; }
+    .paste-tip { padding: 18px; border-radius: 6px; background: #fff8e3; border: 1px solid #f2dda1; }
+    .paste-tip p { margin: 6px 0 0; }
+    .small-note { font-size: 13px; color: #566a79; }
     footer { max-width: 1000px; margin: auto; padding: 0 24px 30px; color: #617481; font-size: 13px; }
-    @media (max-width: 480px) { .actions button { flex: 1 1 auto; } .hero-inner { padding-top: 32px; } }
+    @media (max-width: 480px) { .actions button { flex: 1 1 auto; } .hero-inner { padding-top: 32px; } .app-list { grid-template-columns: 1fr; } }
   </style>
 </head>
 <body>
   <header class="topbar">
     <div class="topbar-inner">
-      <span class="brand-mark" aria-hidden="true">&lt;/&gt;</span>
+      <img class="brand-mark" src="{{ favicon_url }}" width="42" height="42" alt="">
       <div class="brand">Easy Hyperlink<small>A simple link-making tool</small></div>
     </div>
   </header>
@@ -70,7 +91,7 @@
       <form id="link-form">
         <div class="field">
           <label for="name">Link name</label>
-          <input id="name" name="name" maxlength="100" placeholder="e.g. Python website" required>
+          <input id="name" name="name" maxlength="100" placeholder="e.g. Python functions guide" required>
         </div>
         <div class="field">
           <label for="url">Web address</label>
@@ -87,10 +108,56 @@
       <section class="result" id="result" aria-labelledby="result-title" hidden>
         <h2 id="result-title">Your hyperlink</h2>
         <div id="link-container"></div>
-        <p class="hint">Copy the link below, or right-click the link to copy its address.</p>
+        <p class="hint">Use Copy hyperlink, then paste into your email, document, or notes with Ctrl+V (Windows) or ⌘V (Mac). <a href="#where-to-paste">See supported editors and paste tips.</a></p>
         <button class="secondary" id="copy-button" type="button">Copy hyperlink</button>
       </section>
     </div>
+
+    <section class="card" aria-labelledby="how-it-works">
+      <h2 id="how-it-works">How it works</h2>
+      <p class="intro">A hyperlink pairs a readable name with a web address. Your reader sees the name and clicks it to open the original page.</p>
+      <ol class="steps">
+        <li><strong>Name your link.</strong> Choose text that explains the destination, such as “Python functions guide.”</li>
+        <li><strong>Add the address.</strong> Paste the full HTTP or HTTPS URL, then select Create hyperlink.</li>
+        <li><strong>Copy and paste.</strong> Select Copy hyperlink and paste normally into an editor that supports formatted text.</li>
+      </ol>
+      <p class="small-note">The destination stays the same. The tool changes the displayed text; it does not shorten the URL, change access permissions, or save your links.</p>
+    </section>
+
+    <section class="card" aria-labelledby="example-title">
+      <h2 id="example-title">A clearer link in a real message</h2>
+      <p class="intro">Imagine emailing a Python learning resource to a coworker. Both messages below open the same guide.</p>
+      <div class="comparison">
+        <div class="comparison-item">
+          <p class="example-label">Before · regular URL</p>
+          <p>Please review the guide before our next session:</p>
+          <p><code>https://docs.python.org/3/tutorial/controlflow.html#defining-functions</code></p>
+        </div>
+        <div class="comparison-item after">
+          <p class="example-label">After · named hyperlink</p>
+          <p>Please review the <a href="https://docs.python.org/3/tutorial/controlflow.html#defining-functions">Python functions guide</a> before our next session.</p>
+        </div>
+      </div>
+      <button class="secondary" id="try-example" type="button">Try this example</button>
+    </section>
+
+    <section class="card" aria-labelledby="where-to-paste">
+      <h2 id="where-to-paste">Where can I paste and format it?</h2>
+      <p class="intro">These editors support named hyperlinks. Formatted paste depends on your browser, app version, and paste settings. The app names below link to their official help.</p>
+      <ul class="app-list">
+        <li><a href="https://support.google.com/mail/answer/8260?co=GENIE.Platform%3DDesktop">Gmail</a><p>Paste into the email body with plain text mode turned off.</p></li>
+        <li><a href="https://support.microsoft.com/en-us/outlook/format-email-messages-in-outlook-for-mac">Microsoft Outlook</a><p>Use an HTML message body and keep formatting when pasting.</p></li>
+        <li><a href="https://support.microsoft.com/en-us/word/control-the-formatting-when-you-paste-text">Microsoft Word</a><p>Paste into a document. Keep Source Formatting preserves the copied formatting.</p></li>
+        <li><a href="https://support.google.com/docs/answer/45893?hl=en">Google Docs</a><p>Paste into the document body. You can edit the link text and destination afterward.</p></li>
+        <li><a href="https://www.notion.com/help/create-links-and-backlinks">Notion</a><p>Use a page’s text blocks. The page title and other plain text fields may handle links differently.</p></li>
+      </ul>
+      <div class="paste-tip">
+        <h3>Keep the name when you paste</h3>
+        <p>Use a normal paste, rather than Paste as plain text. In editors with paste options, choose Keep Source Formatting or HTML when available. Once pasted, use the destination app’s text tools to style the link.</p>
+        <p>If only the address appears, your browser or destination may have removed the formatting. You can still select text in that app, choose Insert link, and add the original address.</p>
+      </div>
+      <p class="small-note">Plain text editors, address bars, and fields that only accept text will not retain a named, clickable hyperlink. Private files still require the recipient to have permission to open them.</p>
+    </section>
   </main>
   <footer>Easy Hyperlink &middot; Made with Django and FastAPI &middot; <a href="https://oscareustate.com/projects/easy-hyperlink">About this project</a><br>Links are not saved. Only open destinations you trust.</footer>
 

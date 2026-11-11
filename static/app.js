@@ -57,6 +57,12 @@ const apiUrl = document.currentScript.dataset.apiUrl;
       document.getElementById("name").focus();
     });
 
+    document.getElementById("try-example").addEventListener("click", function () {
+      document.getElementById("clear-button").click();
+      document.getElementById("name").value = "Python functions guide";
+      document.getElementById("url").value = "https://docs.python.org/3/tutorial/controlflow.html#defining-functions";
+    });
+
     document.getElementById("copy-button").addEventListener("click", async function () {
       const link = linkContainer.querySelector("a");
       if (!link) return;
