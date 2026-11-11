@@ -6,6 +6,8 @@ Create a named hyperlink, preview it, and copy it as rich text in supported appl
 
 **Project page:** https://oscareustate.com/projects/easy-hyperlink
 
+The page includes a before/after example, a quick usage guide, and [formatted paste guidance](docs/clipboard-compatibility.md) for email and document editors.
+
 ## Run locally
 
 Install Python 3.12+ and [uv](https://docs.astral.sh/uv/), then:
